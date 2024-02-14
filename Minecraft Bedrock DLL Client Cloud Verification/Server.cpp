@@ -3,15 +3,15 @@
 #include <string>
 #include <iostream>
 using namespace std;
-#pragma comment(lib,"ws2_32.lib")	//°Ñws2_32.lib¼Óµ½LinkÒ³µÄÁ¬½Ó¿â  
-#define PORT 19132					//Í¨ĞÅµÄ¶Ë¿Ú£¨Ö¸·şÎñÆ÷¶Ë£©
+#pragma comment(lib,"ws2_32.lib")	//æŠŠws2_32.libåŠ åˆ°Linké¡µçš„è¿æ¥åº“  
+#define PORT 19132					//é€šä¿¡çš„ç«¯å£ï¼ˆæŒ‡æœåŠ¡å™¨ç«¯ï¼‰
 #define ERROR 0  
-#define BUFFER_SIZE 1024			//×¢Òâ£º´ËServer¶ËÊı¾İ½ÓÊÕ»º³åÇø >= Client¶ËÊı¾İ·¢ËÍ»º³åÇø £¬·ñÔòÔì³É»º³åÇøÒç³ö
+#define BUFFER_SIZE 1024			//æ³¨æ„ï¼šæ­¤Serverç«¯æ•°æ®æ¥æ”¶ç¼“å†²åŒº >= Clientç«¯æ•°æ®å‘é€ç¼“å†²åŒº ï¼Œå¦åˆ™é€ æˆç¼“å†²åŒºæº¢å‡º
 /*
-	·şÎñ¶ËÔ­Àí£º
-		1¡¢·şÎñÆ÷½ø³Ì´´½¨Ì×½Ó×Ö
-		2¡¢½«±¾µØµØÖ·°ó¶¨µ½Ëù´´½¨µÄÌ×½Ó×ÖÉÏ£¬ÒÔÈıÔª×é{<Í¨ĞÅĞ­Òé>,<IPµØÖ·>,<¶Ë¿ÚºÅ>}ÔÚÍøÂçÉÏ±êÊ¶¸ÃÌ×½Ó×Ö
-		3¡¢½«Ì×½Ó×ÖÖÃÈë¼àÌıÄ£Ê½£¬²¢×¼±¸½ÓÊÜÁ¬½ÓÇëÇó
+	æœåŠ¡ç«¯åŸç†ï¼š
+		1ã€æœåŠ¡å™¨è¿›ç¨‹åˆ›å»ºå¥—æ¥å­—
+		2ã€å°†æœ¬åœ°åœ°å€ç»‘å®šåˆ°æ‰€åˆ›å»ºçš„å¥—æ¥å­—ä¸Šï¼Œä»¥ä¸‰å…ƒç»„{<é€šä¿¡åè®®>,<IPåœ°å€>,<ç«¯å£å·>}åœ¨ç½‘ç»œä¸Šæ ‡è¯†è¯¥å¥—æ¥å­—
+		3ã€å°†å¥—æ¥å­—ç½®å…¥ç›‘å¬æ¨¡å¼ï¼Œå¹¶å‡†å¤‡æ¥å—è¿æ¥è¯·æ±‚
 */
 
 #include<thread>
@@ -21,23 +21,23 @@ using namespace std;
 int main()
 {
 	WSADATA WSAData;
-	if (WSAStartup(MAKEWORD(2, 0), &WSAData) == SOCKET_ERROR)  //Æô¶¯winsock £¬WSAStartup()º¯Êı¶ÔWinsock DLL½øĞĞ³õÊ¼»¯
+	if (WSAStartup(MAKEWORD(2, 0), &WSAData) == SOCKET_ERROR)  //å¯åŠ¨winsock ï¼ŒWSAStartup()å‡½æ•°å¯¹Winsock DLLè¿›è¡Œåˆå§‹åŒ–
 	{
 		printf("Socket initialize fail!\n");
 		exit(1);
 	}
-	SOCKET sock;										//·şÎñ½ø³Ì´´½¨Ì×½Ó×Ö¾ä±ú£¨ÓÃÓÚ¼àÌı£©
-	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == ERROR)		//µ÷ÓÃsocket()º¯Êı´´½¨Ò»¸öÁ÷Ì×½Ó×Ö£¬²ÎÊı£¨ÍøÂçµØÖ·ÀàĞÍ£¬Ì×½Ó×ÖÀàĞÍ£¬ÍøÂçĞ­Òé£©
+	SOCKET sock;										//æœåŠ¡è¿›ç¨‹åˆ›å»ºå¥—æ¥å­—å¥æŸ„ï¼ˆç”¨äºç›‘å¬ï¼‰
+	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == ERROR)		//è°ƒç”¨socket()å‡½æ•°åˆ›å»ºä¸€ä¸ªæµå¥—æ¥å­—ï¼Œå‚æ•°ï¼ˆç½‘ç»œåœ°å€ç±»å‹ï¼Œå¥—æ¥å­—ç±»å‹ï¼Œç½‘ç»œåè®®ï¼‰
 	{
 		printf("Socket create!\n");
 		WSACleanup();
 		exit(1);
 	}
-	struct sockaddr_in ServerAddr;			//sockaddr_in½á¹¹ÓÃÀ´±êÊ¶TCP/IPĞ­ÒéÏÂµÄµØÖ·£¬¿ÉÇ¿ÖÆ×ª»»Îªsockaddr½á¹¹
-	ServerAddr.sin_family = AF_INET;			//sin_family×Ö¶Î±ØĞëÉèÎªAF_INET£¬±íÊ¾¸ÃSocket´¦ÓÚInternetÓò
-	ServerAddr.sin_port = htons(PORT);		//sin_port×Ö¶ÎÓÃÓÚÖ¸¶¨·şÎñ¶Ë¿Ú£¬×¢Òâ±ÜÃâ³åÍ»
-	ServerAddr.sin_addr.s_addr = INADDR_ANY;  //sin_addr×Ö¶ÎÓÃÓÚ°ÑÒ»¸öIPµØÖ·±£´æÎªÒ»¸ö4×Ö½ÚµÄÊı£¬ÎŞ·ûºÅ³¤ÕûĞÍ£¬¸ù¾İ²»Í¬ÓÃ·¨»¹¿É±íÊ¾±¾µØ»òÔ¶³ÌIPµØÖ·
-	if (bind(sock, (LPSOCKADDR)&ServerAddr, sizeof(ServerAddr)) == SOCKET_ERROR)  //µ÷ÓÃbind()º¯Êı½«±¾µØµØÖ·°ó¶¨µ½Ëù´´½¨µÄÌ×½Ó×ÖÉÏ£¬ÒÔÔÚÍøÂçÉÏ±êÊ¶¸ÃÌ×½Ó×Ö
+	struct sockaddr_in ServerAddr;			//sockaddr_inç»“æ„ç”¨æ¥æ ‡è¯†TCP/IPåè®®ä¸‹çš„åœ°å€ï¼Œå¯å¼ºåˆ¶è½¬æ¢ä¸ºsockaddrç»“æ„
+	ServerAddr.sin_family = AF_INET;			//sin_familyå­—æ®µå¿…é¡»è®¾ä¸ºAF_INETï¼Œè¡¨ç¤ºè¯¥Socketå¤„äºInternetåŸŸ
+	ServerAddr.sin_port = htons(PORT);		//sin_portå­—æ®µç”¨äºæŒ‡å®šæœåŠ¡ç«¯å£ï¼Œæ³¨æ„é¿å…å†²çª
+	ServerAddr.sin_addr.s_addr = INADDR_ANY;  //sin_addrå­—æ®µç”¨äºæŠŠä¸€ä¸ªIPåœ°å€ä¿å­˜ä¸ºä¸€ä¸ª4å­—èŠ‚çš„æ•°ï¼Œæ— ç¬¦å·é•¿æ•´å‹ï¼Œæ ¹æ®ä¸åŒç”¨æ³•è¿˜å¯è¡¨ç¤ºæœ¬åœ°æˆ–è¿œç¨‹IPåœ°å€
+	if (bind(sock, (LPSOCKADDR)&ServerAddr, sizeof(ServerAddr)) == SOCKET_ERROR)  //è°ƒç”¨bind()å‡½æ•°å°†æœ¬åœ°åœ°å€ç»‘å®šåˆ°æ‰€åˆ›å»ºçš„å¥—æ¥å­—ä¸Šï¼Œä»¥åœ¨ç½‘ç»œä¸Šæ ‡è¯†è¯¥å¥—æ¥å­—
 	{
 		printf("Bind fail!\n");
 		closesocket(sock);
@@ -45,58 +45,58 @@ int main()
 		exit(1);
 	}
 	printf("Server Socket Port:%d\n", ntohs(ServerAddr.sin_port));
-	if (listen(sock, 10) == SOCKET_ERROR)		//µ÷ÓÃlisten()º¯Êı½«Ì×½Ó×ÖÖÃÈë¼àÌıÄ£Ê½²¢×¼±¸½ÓÊÜÁ¬½ÓÇëÇó£¬²ÎÊı£¨ÒÑÀ¦°óÎ´Á¬½ÓµÄÌ×½Ó×ÖÃèÊö×Ö£¬ÕıÔÚµÈ´ıÁ¬½ÓµÄ×î´ó¶ÓÁĞ³¤¶È£©
+	if (listen(sock, 10) == SOCKET_ERROR)		//è°ƒç”¨listen()å‡½æ•°å°†å¥—æ¥å­—ç½®å…¥ç›‘å¬æ¨¡å¼å¹¶å‡†å¤‡æ¥å—è¿æ¥è¯·æ±‚ï¼Œå‚æ•°ï¼ˆå·²æ†ç»‘æœªè¿æ¥çš„å¥—æ¥å­—æè¿°å­—ï¼Œæ­£åœ¨ç­‰å¾…è¿æ¥çš„æœ€å¤§é˜Ÿåˆ—é•¿åº¦ï¼‰
 	{
 		printf("Listen fail!\n");
 		closesocket(sock);
 		WSACleanup();
 		exit(1);
 	}
-	SOCKET msgsock;			//´´½¨Ò»¸öĞÂµÄÌ×½Ó×Ö£¨ÓÃÓÚ½ÓÊÕacceptº¯ÊıµÄ·µ»ØÖµ£¬¼´±íÊ¾ÒÑ¾­½ÓÊÜµÄÄÇ¸ö¿Í»§¶ËµÄÁ¬½Ó£¬½ø¶ø½ÓÊÕClient·¢À´µÄÊı¾İ£©
-	char buf[BUFFER_SIZE];  //Êı¾İ½ÓÊÕ»º³åÇø
+	SOCKET msgsock;			//åˆ›å»ºä¸€ä¸ªæ–°çš„å¥—æ¥å­—ï¼ˆç”¨äºæ¥æ”¶acceptå‡½æ•°çš„è¿”å›å€¼ï¼Œå³è¡¨ç¤ºå·²ç»æ¥å—çš„é‚£ä¸ªå®¢æˆ·ç«¯çš„è¿æ¥ï¼Œè¿›è€Œæ¥æ”¶Clientå‘æ¥çš„æ•°æ®ï¼‰
+	char buf[BUFFER_SIZE];  //æ•°æ®æ¥æ”¶ç¼“å†²åŒº
 	char ACC[BUFFER_SIZE];
-	char Den[BUFFER_SIZE];//Ê§°ÜĞÅºÅµÄchar¸ñÊ½
+	char Den[BUFFER_SIZE];//å¤±è´¥ä¿¡å·çš„charæ ¼å¼
 
-	std::string ACC2 = "123";//³É¹¦ĞÅºÅstring,×Ô¼º¼ÓÃÜ
-	std::string Den2 = "456";//Ê§°ÜĞÅºÅ£¬×Ô¼º¼ÓÃÜ
+	std::string ACC2 = "114";//æˆåŠŸä¿¡å·string,è‡ªå·±åŠ å¯†
+	std::string Den2 = "514";//å¤±è´¥ä¿¡å·ï¼Œè‡ªå·±åŠ å¯†
 
 	while (1)
 	{
-		if ((msgsock = accept(sock, (LPSOCKADDR)0, (int*)0)) == INVALID_SOCKET)  //½øÈë¼àÌı×´Ì¬ºó£¬µ÷ÓÃaccept()º¯Êı½ÓÊÕ¿Í»§¶ËµÄÁ¬½ÓÇëÇó£¬²¢°ÑÁ¬½Ó´«¸ømsgsockÌ×½Ó×Ö£¬Ô­sockÌ×½Ó×Ö¼ÌĞø¼àÌıÆäËû¿Í»§»úÁ¬½ÓÇëÇó
+		if ((msgsock = accept(sock, (LPSOCKADDR)0, (int*)0)) == INVALID_SOCKET)  //è¿›å…¥ç›‘å¬çŠ¶æ€åï¼Œè°ƒç”¨accept()å‡½æ•°æ¥æ”¶å®¢æˆ·ç«¯çš„è¿æ¥è¯·æ±‚ï¼Œå¹¶æŠŠè¿æ¥ä¼ ç»™msgsockå¥—æ¥å­—ï¼ŒåŸsockå¥—æ¥å­—ç»§ç»­ç›‘å¬å…¶ä»–å®¢æˆ·æœºè¿æ¥è¯·æ±‚
 		{
 			printf("Accept fail!\n");
 			continue;
 		}
-		memset(buf, 0, sizeof(buf));											//³õÊ¼»¯Êı¾İ½ÓÊÕ»º³åÇø
-		recv(msgsock, buf, BUFFER_SIZE, 0);									//½ÓÊÕ¿Í»§¶Ë·¢ËÍ¹ıÀ´µÄÊı¾İ  
+		memset(buf, 0, sizeof(buf));											//åˆå§‹åŒ–æ•°æ®æ¥æ”¶ç¼“å†²åŒº
+		recv(msgsock, buf, BUFFER_SIZE, 0);									//æ¥æ”¶å®¢æˆ·ç«¯å‘é€è¿‡æ¥çš„æ•°æ®  
 
 		int i;
 		for (i = 0; i < ACC2.length(); i++)
 			ACC[i] = ACC2[i];
-		ACC[i] = '\0';//charºÍstringµÄ×ª»»£¬ÓÃc_str
+		ACC[i] = '\0';//charå’Œstringçš„è½¬æ¢ï¼Œç”¨c_str
 
 		int p;
 		for (p = 0; p < Den2.length(); p++)
 			Den[p] = Den2[p];
-		Den[p] = '\0';//charºÍstringµÄ×ª»»£¬ÓÃc_str
+		Den[p] = '\0';//charå’Œstringçš„è½¬æ¢ï¼Œç”¨c_str
 
-		char sbList[] = "{95a881c0-edfd-11ec-8888-806e6f6e6963}";//ÑéÖ¤ÁĞ±í[ÄãµÄhwid]
+		char sbList[] = "{95a881c0-edfd-11ec-8888-806e6f6e6963}";//éªŒè¯åˆ—è¡¨[ä½ çš„hwid]
 
-		if (!strncmp(sbList, buf, 37)) {   //Ê¶±ğ£¬Èç¹ûÏàµÈ¾Í·¢ËÍ³É¹¦ĞÅºÅ
+		if (!strncmp(sbList, buf, 37)) {   //è¯†åˆ«ï¼Œå¦‚æœç›¸ç­‰å°±å‘é€æˆåŠŸä¿¡å·
 			send(msgsock, ACC, BUFFER_SIZE, 0);
-			printf(":%s³É¹¦", buf);
+			printf(":%sæˆåŠŸ", buf);
 			closesocket(msgsock);  
 		}
 
 		else {
-			send(msgsock, Den, BUFFER_SIZE, 0);//Ê§°Ü£¬·¢ËÍÊ§°ÜĞÅºÅ
-			printf(":%sÊ§°Ü", buf);
+			send(msgsock, Den, BUFFER_SIZE, 0);//å¤±è´¥ï¼Œå‘é€å¤±è´¥ä¿¡å·
+			printf(":%så¤±è´¥", buf);
 			closesocket(msgsock);
 		}
 
 	}
-	closesocket(sock); //¹Ø±ÕÌ×½Ó×Ö  
-	WSACleanup();	   //ÖÕÖ¹¶ÔWinsock DLLµÄÊ¹ÓÃ£¬²¢ÊÍ·Å×ÊÔ´
+	closesocket(sock); //å…³é—­å¥—æ¥å­—  
+	WSACleanup();	   //ç»ˆæ­¢å¯¹Winsock DLLçš„ä½¿ç”¨ï¼Œå¹¶é‡Šæ”¾èµ„æº
 	return 0;
 
 }
