@@ -13,7 +13,7 @@ Server内容是要生成exe（需要你重新开个项目或者用clang什么都
 Client side:，
 1.the shit in Client.cpp should be put in your dll proj and i recommend u put it in Modulemanager，
 2.intially set your ip or port，
-3.then wirte a veri() in initModules() [i think one is enough]，
+3.then wirte a veri() in initModules()， [i think one is enough]，
 ，
 Server side:，
 1.wirte your hwid WhiteList in cpp and remember to set port，
